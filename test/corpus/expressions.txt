@@ -215,11 +215,12 @@ end
     (do_clause
       (identifier)
       (identifier)
-      (call_expression
-        (identifier)
-        (argument_list
+      (block
+        (call_expression
           (identifier)
-          (identifier))))))
+          (argument_list
+            (identifier)
+            (identifier)))))))
 
 ==============================
 macro call expressions
@@ -257,10 +258,11 @@ joinpath(@__DIR__, "grammar.js")
       (string_literal
         (content))
       (compound_statement
-        (assignment
-          (identifier)
-          (operator)
-          (identifier)))))
+        (block
+          (assignment
+            (identifier)
+            (operator)
+            (identifier))))))
   (macrocall_expression
     (macro_identifier
       (operator))
@@ -479,10 +481,11 @@ end
       (interpolation_expression
         (parenthesized_expression
           (identifier))))
-    (interpolation_expression
-      (parenthesized_expression
-        (splat_expression
-          (identifier)))))
+    (block
+      (interpolation_expression
+        (parenthesized_expression
+          (splat_expression
+            (identifier))))))
   (function_definition
     (signature
       (call_expression
@@ -493,15 +496,16 @@ end
           (interpolation_expression
             (parenthesized_expression
               (identifier))))))
-    (call_expression
-      (interpolation_expression
-        (parenthesized_expression
-          (identifier)))
-      (argument_list
+    (block
+      (call_expression
         (interpolation_expression
           (parenthesized_expression
-            (splat_expression
-              (identifier))))))))
+            (identifier)))
+        (argument_list
+          (interpolation_expression
+            (parenthesized_expression
+              (splat_expression
+                (identifier)))))))))
 
 ==============================
 adjoint expressions
