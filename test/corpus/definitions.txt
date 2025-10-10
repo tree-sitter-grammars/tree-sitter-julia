@@ -16,8 +16,9 @@ end
 (source_file
   (module_definition
     name: (identifier)
-    (module_definition name: (identifier))
-    (module_definition name: (identifier))))
+    (block
+      (module_definition name: (identifier))
+      (module_definition name: (identifier)))))
 
 
 ==============================
@@ -99,15 +100,16 @@ end
 
   (struct_definition
     (type_head (identifier))
-    (typed_expression
-      (identifier)
-      (identifier)))
+    (block
+      (typed_expression
+        (identifier)
+        (identifier))))
 
   (struct_definition
     (type_head (identifier))
-    (identifier)
-    (typed_expression (identifier) (identifier))))
-
+    (block
+      (identifier)
+      (typed_expression (identifier) (identifier)))))
 
 ==============================
 parametric struct definitions
@@ -135,8 +137,9 @@ end
       (parametrized_type_expression
         (identifier)
         (curly_expression (identifier))))
-    (typed_expression (identifier) (identifier))
-    (typed_expression (identifier) (identifier)))
+    (block
+      (typed_expression (identifier) (identifier))
+      (typed_expression (identifier) (identifier))))
 
   ;; Parametric subtypes
   (struct_definition
@@ -147,8 +150,9 @@ end
           (curly_expression (binary_expression (identifier) (operator) (identifier))))
         (operator)
         (identifier)))
-    (typed_expression (identifier) (identifier))
-    (typed_expression (identifier) (identifier)))
+    (block
+      (typed_expression (identifier) (identifier))
+      (typed_expression (identifier) (identifier))))
 
   ;; Parametric fields
   (struct_definition
@@ -157,11 +161,12 @@ end
         (identifier)
         (operator)
         (identifier)))
-    (typed_expression
-      (identifier)
-      (parametrized_type_expression
+    (block
+      (typed_expression
         (identifier)
-        (curly_expression (identifier))))))
+        (parametrized_type_expression
+          (identifier)
+          (curly_expression (identifier)))))))
 
 
 ========================================
@@ -176,8 +181,9 @@ end
 (source_file
   (struct_definition
     (type_head (identifier))
-    (const_statement
-      (typed_expression (identifier) (identifier)))))
+    (block
+      (const_statement
+        (typed_expression (identifier) (identifier))))))
 
 
 ==============================
@@ -225,7 +231,8 @@ end
   (function_definition
     (signature
       (call_expression (identifier) (argument_list (identifier))))
-    (identifier))
+    (block
+      (identifier)))
 
   (function_definition
     (signature
@@ -233,32 +240,37 @@ end
         (field_expression value: (identifier) (identifier))
         (argument_list
           (typed_expression (identifier) (identifier)))))
-    (return_statement (integer_literal)))
+    (block
+      (return_statement (integer_literal))))
 
   (function_definition
     (signature
       (call_expression (identifier) (argument_list (identifier))))
-    (call_expression (identifier) (argument_list (identifier))))
+    (block
+      (call_expression (identifier) (argument_list (identifier)))))
 
   (function_definition
     (signature
       (call_expression (operator) (argument_list (identifier) (identifier))))
-    (binary_expression
-      (identifier)
-      (operator)
-      (identifier)))
+    (block
+      (binary_expression
+        (identifier)
+        (operator)
+        (identifier))))
 
   ;; Anonymous function
   (function_definition
     (signature
       (call_expression (identifier) (argument_list (identifier) (identifier))))
-    (return_statement
-      (function_definition
-        (signature
-          (argument_list (identifier)))
-        (call_expression
-          (identifier)
-          (argument_list (identifier) (identifier))))))
+    (block
+      (return_statement
+        (function_definition
+          (signature
+            (argument_list (identifier)))
+          (block
+          (call_expression
+            (identifier)
+            (argument_list (identifier) (identifier))))))))
 
   ;; Function Objects
   (function_definition
@@ -404,7 +416,8 @@ function g(; x, y::Int, z = 1, kwargs...) nothing end
             (identifier))
           (assignment (identifier) (operator) (integer_literal))
           (splat_expression (identifier)))))
-    (identifier)))
+    (block
+      (identifier))))
 
 
 ==================================================
@@ -428,10 +441,11 @@ end
           (identifier)
           (argument_list (identifier)))
         (identifier)))
-    (call_expression
-      (identifier)
-      (argument_list
-        (binary_expression (identifier) (operator) (integer_literal)))))
+    (block
+      (call_expression
+        (identifier)
+        (argument_list
+          (binary_expression (identifier) (operator) (integer_literal))))))
   (function_definition
     (signature
       (typed_expression
@@ -443,11 +457,12 @@ end
               (identifier)
               (field_expression (identifier) (identifier)))))
         (field_expression (identifier) (identifier))))
-    (call_expression
-      (identifier)
-      (argument_list
+    (block
+      (call_expression
         (identifier)
-        (identifier)))))
+        (argument_list
+          (identifier)
+          (identifier))))))
 
 
 ==================================================
@@ -474,7 +489,8 @@ end
       (call_expression
         (identifier)
         (argument_list (tuple_expression (identifier) (identifier)))))
-    (tuple_expression (identifier) (identifier)))
+    (block
+      (tuple_expression (identifier) (identifier))))
 
 
   (function_definition
@@ -486,7 +502,8 @@ end
             (tuple_expression (identifier) (identifier))
             (operator)
             (tuple_expression (integer_literal) (integer_literal))))))
-    (tuple_expression (identifier) (identifier)))
+    (block
+      (tuple_expression (identifier) (identifier))))
 
   (function_definition
     (signature
@@ -500,7 +517,8 @@ end
                 (identifier)
                 (curly_expression (identifier) (identifier))))))
         (identifier)))
-    (identifier)))
+    (block
+      (identifier))))
 
 
 ==================================================
@@ -554,7 +572,8 @@ Base.show(io::IO, ::MIME"text/plain", m::Method; kwargs...) = show_method(io, m,
             (identifier)
             (operator)
             (identifier)))))
-    (identifier))
+    (block
+      (identifier)))
 
   ;; Short function `where`
   (assignment
@@ -610,7 +629,8 @@ Base.show(io::IO, ::MIME"text/plain", m::Method; kwargs...) = show_method(io, m,
               (identifier)
               (operator)
               (identifier))))))
-    (call_expression (identifier) (argument_list (identifier))))
+    (block
+      (call_expression (identifier) (argument_list (identifier)))))
 
   ;; Almost everything at once
   (assignment
@@ -654,9 +674,10 @@ macro count(args...) length(args) end
           (identifier)
           (argument_list
             (typed_expression (identifier) (identifier)))))
-      (call_expression
-        (identifier)
-        (argument_list (identifier))))
+      (block
+        (call_expression
+          (identifier)
+          (argument_list (identifier)))))
 
     (macro_definition
       (signature
@@ -664,7 +685,8 @@ macro count(args...) length(args) end
           (identifier)
           (argument_list
             (splat_expression (identifier)))))
-      (call_expression
-        (identifier)
-        (argument_list (identifier)))))
+      (block
+        (call_expression
+          (identifier)
+          (argument_list (identifier))))))
 

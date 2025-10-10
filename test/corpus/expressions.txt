@@ -192,9 +192,10 @@ end
     (do_clause
       (identifier)
       (identifier)
-      (call_expression
-        (identifier)
-        (argument_list (identifier) (identifier))))))
+      (block
+        (call_expression
+          (identifier)
+          (argument_list (identifier) (identifier)))))))
 
 
 ==============================
@@ -225,7 +226,9 @@ joinpath(@__DIR__, "grammar.js")
     (macro_identifier (identifier))
     (macro_argument_list
       (string_literal (content))
-      (compound_statement (assignment (identifier) (operator) (identifier)))))
+      (compound_statement
+        (block
+          (assignment (identifier) (operator) (identifier))))))
 
   (macrocall_expression
     (macro_identifier (operator))
@@ -414,8 +417,9 @@ end
     (type_head
       (interpolation_expression
         (parenthesized_expression (identifier))))
-    (interpolation_expression
-      (parenthesized_expression (splat_expression (identifier)))))
+    (block
+      (interpolation_expression
+        (parenthesized_expression (splat_expression (identifier))))))
   (function_definition
     (signature
       (call_expression
@@ -424,12 +428,13 @@ end
         (argument_list
           (interpolation_expression
             (parenthesized_expression (identifier))))))
+    (block
       (call_expression
         (interpolation_expression
           (parenthesized_expression (identifier)))
         (argument_list
           (interpolation_expression
-            (parenthesized_expression (splat_expression (identifier))))))))
+            (parenthesized_expression (splat_expression (identifier)))))))))
 
 
 ==============================

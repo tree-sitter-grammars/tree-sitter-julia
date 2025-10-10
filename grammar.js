@@ -181,9 +181,12 @@ module.exports = grammar({
   ],
 
   rules: {
-    source_file: $ => optional($._block),
+    source_file: $ => optional(seq(
+      sep1($._terminator, $._block_form),
+      optional($._terminator)
+    )),
 
-    _block: $ => seq(
+    block: $ => seq(
       sep1($._terminator, $._block_form),
       optional($._terminator)
     ),
@@ -258,7 +261,7 @@ module.exports = grammar({
       choice('module', 'baremodule'),
       field('name', choice($.identifier, $.interpolation_expression)),
       optional($._terminator),
-      optional($._block),
+      optional($.block),
       'end',
     ),
 
@@ -288,7 +291,7 @@ module.exports = grammar({
       'struct',
       $.type_head,
       optional($._terminator),
-      optional($._block),
+      optional($.block),
       'end',
     ),
 
@@ -304,7 +307,7 @@ module.exports = grammar({
       'function',
       $.signature,
       optional($._terminator),
-      optional($._block),
+      optional($.block),
       'end',
     ),
 
@@ -312,7 +315,7 @@ module.exports = grammar({
       'macro',
       $.signature,
       optional($._terminator),
-      optional($._block),
+      optional($.block),
       'end',
     ),
 
@@ -341,15 +344,15 @@ module.exports = grammar({
       $.using_statement,
     ),
 
-    compound_statement: $ => seq('begin', optional($._terminator), optional($._block), 'end'),
+    compound_statement: $ => seq('begin', optional($._terminator), optional($.block), 'end'),
 
-    quote_statement: $ => seq('quote', optional($._terminator), optional($._block), 'end'),
+    quote_statement: $ => seq('quote', optional($._terminator), optional($.block), 'end'),
 
     let_statement: $ => seq(
       'let',
       sep(',', $._bracket_form),
       $._terminator,
-      optional($._block),
+      optional($.block),
       'end',
     ),
 
@@ -357,7 +360,7 @@ module.exports = grammar({
       'if',
       field('condition', $._expression),
       optional($._terminator),
-      optional($._block),
+      optional($.block),
       field('alternative', repeat($.elseif_clause)),
       field('alternative', optional($.else_clause)),
       'end',
@@ -367,19 +370,19 @@ module.exports = grammar({
       'elseif',
       field('condition', $._expression),
       optional($._terminator),
-      optional($._block),
+      optional($.block),
     ),
 
     else_clause: $ => seq(
       'else',
       optional($._terminator),
-      optional($._block),
+      optional($.block),
     ),
 
     try_statement: $ => seq(
       'try',
       optional($._terminator),
-      optional($._block),
+      optional($.block),
       choice(
         seq(
           $.catch_clause,
@@ -399,20 +402,20 @@ module.exports = grammar({
       'catch',
       optional($.identifier),
       optional($._terminator),
-      optional($._block),
+      optional($.block),
     )),
 
     finally_clause: $ => seq(
       'finally',
       optional($._terminator),
-      optional($._block),
+      optional($.block),
     ),
 
     for_statement: $ => seq(
       'for',
       sep1(',', $.for_binding),
       optional($._terminator),
-      optional($._block),
+      optional($.block),
       'end',
     ),
 
@@ -420,7 +423,7 @@ module.exports = grammar({
       'while',
       field('condition', $._expression),
       optional($._terminator),
-      optional($._block),
+      optional($.block),
       'end',
     ),
 
@@ -688,7 +691,7 @@ module.exports = grammar({
       'do',
       sep(',', $._bracket_form),
       $._terminator,
-      optional($._block),
+      optional($.block),
       'end',
     ),
 
