@@ -894,7 +894,9 @@ module.exports = grammar({
       // Some symbols in Sm and So unicode categories that are identifiers
       const validMathSymbols = '°∀-∇∎-∑∫-∳';
 
-      const start = `[_\\p{XID_Start}${validMathSymbols}\\p{Emoji}&&[^0-9#*]]`;
+      // Emojis are valid Julia identifiers but unsupported due to exploding parser size
+      // todo(clason): check if regex can be optimized
+      const start = `[_\\p{XID_Start}${validMathSymbols}&&[^0-9#*]]`;
       const rest = `[^"'\`\\s\\.\\-\\[\\]${nonIdentifierCharacters}]*`;
       return new RegExp(start + rest);
     },
