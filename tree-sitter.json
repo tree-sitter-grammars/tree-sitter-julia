@@ -3,12 +3,15 @@
     {
       "name": "julia",
       "camelcase": "Julia",
-      "scope": "source.julia",
       "path": ".",
+      "scope": "source.julia",
+      "injection-regex": "^(jl|julia)$",
       "file-types": [
         "jl"
       ],
-      "injection-regex": "^(jl|julia)$"
+      "highlights": "queries/query/highlights.scm",
+      "injections": "queries/query/injections.scm",
+      "locals": "queries/query/locals.scm"
     }
   ],
   "metadata": {
@@ -26,15 +29,7 @@
       }
     ],
     "links": {
-      "repository": "https://github.com/tree-sitter/tree-sitter-julia"
+      "repository": "https://github.com/tree-sitter-grammars/tree-sitter-julia"
     }
-  },
-  "bindings": {
-    "c": true,
-    "go": true,
-    "node": true,
-    "python": true,
-    "rust": true,
-    "swift": true
   }
 }
