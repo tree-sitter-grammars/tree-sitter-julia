@@ -11,8 +11,6 @@ x′
 logŷ
 ϵ
 ŷ
-🙋
-🦀
 
 ---
 
@@ -27,10 +25,7 @@ logŷ
   (identifier)
   (identifier)
   (identifier)
-  (identifier)
-  (identifier)
   (identifier))
-
 
 ==============================
 field expressions
@@ -57,28 +52,28 @@ df."a"
         (identifier)
         (identifier))
       (identifier))
-      (identifier))
-
+    (identifier))
   (field_expression
     (parenthesized_expression
       (field_expression
         (call_expression
           (field_expression
-            (index_expression (identifier) (vector_expression (integer_literal)))
+            (index_expression
+              (identifier)
+              (vector_expression
+                (integer_literal)))
             (identifier))
           (argument_list))
         (identifier)))
     (identifier))
-
   (field_expression
     (identifier)
     (quote_expression
       (operator)))
-
   (field_expression
     (identifier)
-    (string_literal (content))))
-
+    (string_literal
+      (content))))
 
 ==============================
 index expressions
@@ -89,6 +84,7 @@ a[1, :]
 "foo"[1]
 
 ---
+
 (source_file
   (index_expression
     (identifier)
@@ -102,9 +98,10 @@ a[1, :]
       (integer_literal)
       (operator)))
   (index_expression
-    (string_literal (content))
-    (vector_expression (integer_literal))))
-
+    (string_literal
+      (content))
+    (vector_expression
+      (integer_literal))))
 
 ==============================
 type parametrized expressions
@@ -121,22 +118,30 @@ $(usertype){T}
 (source_file
   (parametrized_type_expression
     (identifier)
-    (curly_expression (identifier)))
+    (curly_expression
+      (identifier)))
   (parametrized_type_expression
     (identifier)
-    (curly_expression (unary_expression (operator) (identifier))))
+    (curly_expression
+      (unary_expression
+        (operator)
+        (identifier))))
   (parametrized_type_expression
-    (interpolation_expression (parenthesized_expression (identifier)))
-    (curly_expression (identifier)))
-
-  ; Gen.jl example
+    (interpolation_expression
+      (parenthesized_expression
+        (identifier)))
+    (curly_expression
+      (identifier)))
   (compound_assignment_expression
-    (curly_expression (quote_expression (identifier)))
+    (curly_expression
+      (quote_expression
+        (identifier)))
     (operator)
     (call_expression
       (identifier)
-      (argument_list (integer_literal) (integer_literal)))))
-
+      (argument_list
+        (integer_literal)
+        (integer_literal)))))
 
 ==============================
 function call expressions
@@ -154,26 +159,43 @@ new{typeof(xs)}(xs)
 ---
 
 (source_file
-  (call_expression (identifier) (argument_list))
-  (call_expression (identifier) (argument_list (string_literal (content)) (integer_literal)))
-  (call_expression (identifier) (argument_list (splat_expression (identifier))))
-
+  (call_expression
+    (identifier)
+    (argument_list))
+  (call_expression
+    (identifier)
+    (argument_list
+      (string_literal
+        (content))
+      (integer_literal)))
+  (call_expression
+    (identifier)
+    (argument_list
+      (splat_expression
+        (identifier))))
   (call_expression
     (identifier)
     (argument_list
       (identifier)
-      (assignment (identifier) (operator) (identifier))))
+      (assignment
+        (identifier)
+        (operator)
+        (identifier))))
   (call_expression
     (identifier)
-    (argument_list (identifier) (identifier)))
-
+    (argument_list
+      (identifier)
+      (identifier)))
   (call_expression
     (parametrized_type_expression
       (identifier)
       (curly_expression
-        (call_expression (identifier) (argument_list (identifier)))))
-    (argument_list (identifier))))
-
+        (call_expression
+          (identifier)
+          (argument_list
+            (identifier)))))
+    (argument_list
+      (identifier))))
 
 ========================================
 function call expressions with do blocks
@@ -188,14 +210,16 @@ end
 (source_file
   (call_expression
     (identifier)
-    (argument_list (identifier))
+    (argument_list
+      (identifier))
     (do_clause
       (identifier)
       (identifier)
       (call_expression
         (identifier)
-        (argument_list (identifier) (identifier))))))
-
+        (argument_list
+          (identifier)
+          (identifier))))))
 
 ==============================
 macro call expressions
@@ -214,43 +238,60 @@ joinpath(@__DIR__, "grammar.js")
 @macroexpand @async accept(socket)
 
 ---
+
 (source_file
   (macrocall_expression
-    (macro_identifier (identifier))
-    (macro_argument_list
-      (binary_expression (identifier) (operator) (identifier))
-      (string_literal (content))))
-
-  (macrocall_expression
-    (macro_identifier (identifier))
-    (macro_argument_list
-      (string_literal (content))
-      (compound_statement (assignment (identifier) (operator) (identifier)))))
-
-  (macrocall_expression
-    (macro_identifier (operator))
+    (macro_identifier
+      (identifier))
     (macro_argument_list
       (binary_expression
-        (binary_expression (identifier) (operator) (identifier))
+        (identifier)
+        (operator)
+        (identifier))
+      (string_literal
+        (content))))
+  (macrocall_expression
+    (macro_identifier
+      (identifier))
+    (macro_argument_list
+      (string_literal
+        (content))
+      (compound_statement
+        (assignment
+          (identifier)
+          (operator)
+          (identifier)))))
+  (macrocall_expression
+    (macro_identifier
+      (operator))
+    (macro_argument_list
+      (binary_expression
+        (binary_expression
+          (identifier)
+          (operator)
+          (identifier))
         (operator)
         (identifier))))
-
-  ; Macros as arguments
   (call_expression
     (identifier)
     (argument_list
-      (macrocall_expression (macro_identifier (identifier)))
-      (string_literal (content))))
-
-  ; Nested macros
+      (macrocall_expression
+        (macro_identifier
+          (identifier)))
+      (string_literal
+        (content))))
   (macrocall_expression
-    (macro_identifier (identifier))
+    (macro_identifier
+      (identifier))
     (macro_argument_list
       (macrocall_expression
-        (macro_identifier (identifier))
+        (macro_identifier
+          (identifier))
         (macro_argument_list
-          (call_expression (identifier) (argument_list (identifier))))))))
-
+          (call_expression
+            (identifier)
+            (argument_list
+              (identifier))))))))
 
 ==============================
 Qualified macro identifiers
@@ -260,19 +301,27 @@ Qualified macro identifiers
 Meta.@dump x = 1
 
 ---
+
 (source_file
   (macrocall_expression
     (macro_identifier
-      (field_expression (identifier) (identifier)))
+      (field_expression
+        (identifier)
+        (identifier)))
     (macro_argument_list
-      (call_expression (identifier) (argument_list))))
+      (call_expression
+        (identifier)
+        (argument_list))))
   (macrocall_expression
     (field_expression
       (identifier)
-      (macro_identifier (identifier)))
+      (macro_identifier
+        (identifier)))
     (macro_argument_list
-      (assignment (identifier) (operator) (integer_literal)))))
-
+      (assignment
+        (identifier)
+        (operator)
+        (integer_literal)))))
 
 ==============================
 closed macro call expressions
@@ -285,37 +334,46 @@ f(@nospecialize(x)) = x
 @m [1, 2] + 1
 
 ---
+
 (source_file
   (macrocall_expression
-    (macro_identifier (identifier))
-    (argument_list (identifier) (identifier) (identifier) (identifier)))
-
-  ; Macros as parameters
+    (macro_identifier
+      (identifier))
+    (argument_list
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier)))
   (assignment
     (call_expression
       (identifier)
       (argument_list
         (macrocall_expression
-          (macro_identifier (identifier))
-          (argument_list (identifier)))))
+          (macro_identifier
+            (identifier))
+          (argument_list
+            (identifier)))))
     (operator)
     (identifier))
-
-  ; Open vs closed macros
   (binary_expression
     (macrocall_expression
-      (macro_identifier (identifier))
-      (vector_expression (integer_literal) (integer_literal)))
+      (macro_identifier
+        (identifier))
+      (vector_expression
+        (integer_literal)
+        (integer_literal)))
     (operator)
     (integer_literal))
   (macrocall_expression
-    (macro_identifier (identifier))
+    (macro_identifier
+      (identifier))
     (macro_argument_list
       (binary_expression
-        (vector_expression (integer_literal) (integer_literal))
+        (vector_expression
+          (integer_literal)
+          (integer_literal))
         (operator)
         (integer_literal)))))
-
 
 ==============================
 quote expressions
@@ -333,10 +391,12 @@ quote expressions
 :(::)
 
 ---
-(source_file
-  (quote_expression (identifier))
-  (quote_expression (identifier))
 
+(source_file
+  (quote_expression
+    (identifier))
+  (quote_expression
+    (identifier))
   (quote_expression
     (parenthesized_expression
       (identifier)
@@ -350,12 +410,12 @@ quote expressions
       (identifier)
       (identifier)
       (identifier)))
-  ; Operator
-  (quote_expression (operator))
-  ; Syntactic operators
-  (quote_expression (operator))
-  (quote_expression (operator)))
-
+  (quote_expression
+    (operator))
+  (quote_expression
+    (operator))
+  (quote_expression
+    (operator)))
 
 ==============================
 interpolation expressions
@@ -403,34 +463,45 @@ end
     (vector_expression
       (integer_literal)
       (integer_literal)))
-  (interpolation_expression (string_literal (content)))
+  (interpolation_expression
+    (string_literal
+      (content)))
   (using_statement
     (selected_import
-      (interpolation_expression (identifier))
-      (interpolation_expression (parenthesized_expression (identifier)))))
-
+      (interpolation_expression
+        (identifier))
+      (interpolation_expression
+        (parenthesized_expression
+          (identifier)))))
   (line_comment)
   (struct_definition
     (type_head
       (interpolation_expression
-        (parenthesized_expression (identifier))))
+        (parenthesized_expression
+          (identifier))))
     (interpolation_expression
-      (parenthesized_expression (splat_expression (identifier)))))
+      (parenthesized_expression
+        (splat_expression
+          (identifier)))))
   (function_definition
     (signature
       (call_expression
         (interpolation_expression
-          (parenthesized_expression (identifier)))
+          (parenthesized_expression
+            (identifier)))
         (argument_list
           (interpolation_expression
-            (parenthesized_expression (identifier))))))
-      (call_expression
+            (parenthesized_expression
+              (identifier))))))
+    (call_expression
+      (interpolation_expression
+        (parenthesized_expression
+          (identifier)))
+      (argument_list
         (interpolation_expression
-          (parenthesized_expression (identifier)))
-        (argument_list
-          (interpolation_expression
-            (parenthesized_expression (splat_expression (identifier))))))))
-
+          (parenthesized_expression
+            (splat_expression
+              (identifier))))))))
 
 ==============================
 adjoint expressions
@@ -444,19 +515,29 @@ f'(x)
 
 
 ---
+
 (source_file
   (adjoint_expression
-    (vector_expression (identifier) (identifier)))
+    (vector_expression
+      (identifier)
+      (identifier)))
   (index_expression
-    (adjoint_expression (identifier))
-    (vector_expression (identifier)))
+    (adjoint_expression
+      (identifier))
+    (vector_expression
+      (identifier)))
   (adjoint_expression
-    (tuple_expression (identifier) (identifier)))
+    (tuple_expression
+      (identifier)
+      (identifier)))
   (call_expression
-    (adjoint_expression (identifier))
-    (argument_list (identifier)))
+    (adjoint_expression
+      (identifier))
+    (argument_list
+      (identifier)))
   (adjoint_expression
-    (quote_expression (identifier))))
+    (quote_expression
+      (identifier))))
 
 ==============================
 juxtaposition expressions
@@ -479,39 +560,60 @@ x'x
     (identifier))
   (juxtaposition_expression
     (integer_literal)
-    (index_expression (identifier) (vector_expression (identifier))))
+    (index_expression
+      (identifier)
+      (vector_expression
+        (identifier))))
   (juxtaposition_expression
     (integer_literal)
-    (call_expression (identifier) (argument_list (identifier))))
+    (call_expression
+      (identifier)
+      (argument_list
+        (identifier))))
   (juxtaposition_expression
     (integer_literal)
-    (field_expression (identifier) (identifier)))
+    (field_expression
+      (identifier)
+      (identifier)))
   (juxtaposition_expression
     (integer_literal)
-    (prefixed_string_literal (identifier) (content)))
+    (prefixed_string_literal
+      (identifier)
+      (content)))
   (juxtaposition_expression
-    (adjoint_expression (identifier))
+    (adjoint_expression
+      (identifier))
     (identifier))
-
-  (binary_expression
-    (binary_expression
-      (juxtaposition_expression (integer_literal) (identifier))
-      (operator)
-      (integer_literal))
-    (operator)
-    (juxtaposition_expression (float_literal) (identifier)))
   (binary_expression
     (binary_expression
       (juxtaposition_expression
         (integer_literal)
-        (parenthesized_expression (binary_expression (identifier) (operator) (integer_literal))))
+        (identifier))
+      (operator)
+      (integer_literal))
+    (operator)
+    (juxtaposition_expression
+      (float_literal)
+      (identifier)))
+  (binary_expression
+    (binary_expression
+      (juxtaposition_expression
+        (integer_literal)
+        (parenthesized_expression
+          (binary_expression
+            (identifier)
+            (operator)
+            (integer_literal))))
       (operator)
       (integer_literal))
     (operator)
     (juxtaposition_expression
       (integer_literal)
-      (parenthesized_expression (binary_expression (identifier) (operator) (integer_literal))))))
-
+      (parenthesized_expression
+        (binary_expression
+          (identifier)
+          (operator)
+          (integer_literal))))))
 
 =============================
 arrow function expressions
@@ -528,12 +630,21 @@ a -> a = 2, 3
 (source_file
   (arrow_function_expression
     (identifier)
-    (binary_expression (identifier) (operator) (integer_literal)))
+    (binary_expression
+      (identifier)
+      (operator)
+      (integer_literal)))
   (arrow_function_expression
-    (argument_list (identifier) (identifier) (identifier))
+    (argument_list
+      (identifier)
+      (identifier)
+      (identifier))
     (binary_expression
       (binary_expression
-        (binary_expression (integer_literal) (operator) (identifier))
+        (binary_expression
+          (integer_literal)
+          (operator)
+          (identifier))
         (operator)
         (identifier))
       (operator)
@@ -544,12 +655,20 @@ a -> a = 2, 3
   (arrow_function_expression
     (argument_list)
     (parenthesized_expression
-      (call_expression (identifier) (argument_list (float_literal)))
-      (compound_assignment_expression (identifier) (operator) (integer_literal))
+      (call_expression
+        (identifier)
+        (argument_list
+          (float_literal)))
+      (compound_assignment_expression
+        (identifier)
+        (operator)
+        (integer_literal))
       (identifier)))
   (open_tuple
     (arrow_function_expression
       (identifier)
-      (assignment (identifier) (operator) (integer_literal)))
+      (assignment
+        (identifier)
+        (operator)
+        (integer_literal)))
     (integer_literal)))
-
