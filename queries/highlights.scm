@@ -27,10 +27,16 @@
   (field_expression
     (identifier) @function.call .))
 
+(binary_expression
+  (_)
+  (operator) @_pipe
+  (identifier) @function.call
+  (#any-of? @_pipe "|>" ".|>"))
+
 ; Macros
 (macro_identifier
   "@" @function.macro
-  (_) @function.macro)
+  (identifier) @function.macro)
 
 (macro_definition
   (signature
@@ -68,7 +74,16 @@
   (identifier) @type .)
 
 (where_expression
-  (_) @type .)
+  [
+    (curly_expression
+      (_) @type)
+    (_) @type
+  ] .)
+
+(unary_expression
+  (operator) @operator
+  (_) @type
+  (#any-of? @operator "<:" ">:"))
 
 (binary_expression
   (_) @type
@@ -95,7 +110,6 @@
 
 ; Keywords
 [
-  "const"
   "global"
   "local"
 ] @keyword
@@ -174,6 +188,11 @@
   (break_statement)
   (continue_statement)
 ] @keyword.repeat
+
+[
+  "const"
+  "mutable"
+] @keyword.modifier
 
 (function_definition
   [
@@ -257,13 +276,21 @@
 [
   "."
   "..."
-  "::"
-] @punctuation
+] @punctuation.special
 
 [
   ","
   ";"
+  "::"
 ] @punctuation.delimiter
+
+; Treat `::` as operator in type contexts, see
+; https://github.com/nvim-treesitter/nvim-treesitter/pull/7392
+(typed_expression
+  "::" @operator)
+
+(unary_typed_expression
+  "::" @operator)
 
 [
   "("
@@ -273,6 +300,15 @@
   "{"
   "}"
 ] @punctuation.bracket
+
+; Interpolation
+(string_interpolation
+  .
+  "$" @punctuation.special)
+
+(interpolation_expression
+  .
+  "$" @punctuation.special)
 
 ; Keyword operators
 ((operator) @keyword.operator
@@ -323,6 +359,14 @@
     (macro_definition)
     (module_definition)
     (struct_definition)
+  ])
+
+(source_file
+  (string_literal) @string.documentation
+  .
+  [
+    (identifier)
+    (call_expression)
   ])
 
 [
