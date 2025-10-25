@@ -9,9 +9,9 @@
       "file-types": [
         "jl"
       ],
-      "highlights": "queries/query/highlights.scm",
-      "injections": "queries/query/injections.scm",
-      "locals": "queries/query/locals.scm"
+      "highlights": "queries/highlights.scm",
+      "injections": "queries/injections.scm",
+      "locals": "queries/locals.scm"
     }
   ],
   "metadata": {
