@@ -460,6 +460,29 @@
     }
   },
   {
+    "type": "block",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "_expression",
+          "named": true
+        },
+        {
+          "type": "assignment",
+          "named": true
+        },
+        {
+          "type": "open_tuple",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "block_comment",
     "named": true,
     "extra": true,
@@ -697,15 +720,11 @@
       "required": false,
       "types": [
         {
-          "type": "_expression",
+          "type": "block",
           "named": true
         },
         {
-          "type": "assignment",
-          "named": true
-        },
-        {
-          "type": "open_tuple",
+          "type": "identifier",
           "named": true
         }
       ]
@@ -754,19 +773,11 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": false,
       "types": [
         {
-          "type": "_expression",
-          "named": true
-        },
-        {
-          "type": "assignment",
-          "named": true
-        },
-        {
-          "type": "open_tuple",
+          "type": "block",
           "named": true
         }
       ]
@@ -858,7 +869,7 @@
           "named": true
         },
         {
-          "type": "open_tuple",
+          "type": "block",
           "named": true
         }
       ]
@@ -869,19 +880,11 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": false,
       "types": [
         {
-          "type": "_expression",
-          "named": true
-        },
-        {
-          "type": "assignment",
-          "named": true
-        },
-        {
-          "type": "open_tuple",
+          "type": "block",
           "named": true
         }
       ]
@@ -903,19 +906,11 @@
       }
     },
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": false,
       "types": [
         {
-          "type": "_expression",
-          "named": true
-        },
-        {
-          "type": "assignment",
-          "named": true
-        },
-        {
-          "type": "open_tuple",
+          "type": "block",
           "named": true
         }
       ]
@@ -1151,19 +1146,11 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": false,
       "types": [
         {
-          "type": "_expression",
-          "named": true
-        },
-        {
-          "type": "assignment",
-          "named": true
-        },
-        {
-          "type": "open_tuple",
+          "type": "block",
           "named": true
         }
       ]
@@ -1213,19 +1200,11 @@
       "required": true,
       "types": [
         {
-          "type": "_expression",
-          "named": true
-        },
-        {
-          "type": "assignment",
+          "type": "block",
           "named": true
         },
         {
           "type": "for_binding",
-          "named": true
-        },
-        {
-          "type": "open_tuple",
           "named": true
         }
       ]
@@ -1240,15 +1219,7 @@
       "required": true,
       "types": [
         {
-          "type": "_expression",
-          "named": true
-        },
-        {
-          "type": "assignment",
-          "named": true
-        },
-        {
-          "type": "open_tuple",
+          "type": "block",
           "named": true
         },
         {
@@ -1358,19 +1329,11 @@
       }
     },
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": false,
       "types": [
         {
-          "type": "_expression",
-          "named": true
-        },
-        {
-          "type": "assignment",
-          "named": true
-        },
-        {
-          "type": "open_tuple",
+          "type": "block",
           "named": true
         }
       ]
@@ -1760,7 +1723,7 @@
           "named": true
         },
         {
-          "type": "open_tuple",
+          "type": "block",
           "named": true
         }
       ]
@@ -1827,15 +1790,7 @@
       "required": true,
       "types": [
         {
-          "type": "_expression",
-          "named": true
-        },
-        {
-          "type": "assignment",
-          "named": true
-        },
-        {
-          "type": "open_tuple",
+          "type": "block",
           "named": true
         },
         {
@@ -1969,19 +1924,11 @@
       }
     },
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": false,
       "types": [
         {
-          "type": "_expression",
-          "named": true
-        },
-        {
-          "type": "assignment",
-          "named": true
-        },
-        {
-          "type": "open_tuple",
+          "type": "block",
           "named": true
         }
       ]
@@ -2331,19 +2278,11 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": false,
       "types": [
         {
-          "type": "_expression",
-          "named": true
-        },
-        {
-          "type": "assignment",
-          "named": true
-        },
-        {
-          "type": "open_tuple",
+          "type": "block",
           "named": true
         }
       ]
@@ -2543,15 +2482,7 @@
       "required": true,
       "types": [
         {
-          "type": "_expression",
-          "named": true
-        },
-        {
-          "type": "assignment",
-          "named": true
-        },
-        {
-          "type": "open_tuple",
+          "type": "block",
           "named": true
         },
         {
@@ -2589,11 +2520,7 @@
       "required": true,
       "types": [
         {
-          "type": "_expression",
-          "named": true
-        },
-        {
-          "type": "assignment",
+          "type": "block",
           "named": true
         },
         {
@@ -2606,10 +2533,6 @@
         },
         {
           "type": "finally_clause",
-          "named": true
-        },
-        {
-          "type": "open_tuple",
           "named": true
         }
       ]
@@ -2959,19 +2882,11 @@
       }
     },
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": false,
       "types": [
         {
-          "type": "_expression",
-          "named": true
-        },
-        {
-          "type": "assignment",
-          "named": true
-        },
-        {
-          "type": "open_tuple",
+          "type": "block",
           "named": true
         }
       ]
