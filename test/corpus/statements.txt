@@ -16,9 +16,10 @@ end
 (source_file
   (compound_statement)
   (compound_statement
-    (identifier)
-    (identifier)
-    (identifier)))
+    (block
+      (identifier)
+      (identifier)
+      (identifier))))
 
 
 ==============================
@@ -38,9 +39,10 @@ end
 (source_file
   (quote_statement)
   (quote_statement
-    (assignment (identifier) (operator) (integer_literal))
-    (assignment (identifier) (operator) (integer_literal))
-    (binary_expression (identifier) (operator) (identifier))))
+    (block
+      (assignment (identifier) (operator) (integer_literal))
+      (assignment (identifier) (operator) (integer_literal))
+      (binary_expression (identifier) (operator) (identifier)))))
 
 
 ==============================
@@ -62,7 +64,8 @@ end
     (assignment (identifier) (operator) (identifier))
     (identifier)
     (assignment (identifier) (operator) (identifier))
-    (identifier)))
+    (block
+      (identifier))))
 
 
 ==============================
@@ -97,19 +100,24 @@ end
 
   (if_statement
     (boolean_literal)
-    (integer_literal)
+    (block
+      (integer_literal))
     (else_clause
-      (integer_literal)))
+      (block
+        (integer_literal))))
 
   (if_statement
     (identifier)
-    (call_expression (identifier) (argument_list))
+    (block
+      (call_expression (identifier) (argument_list)))
     (elseif_clause
       (identifier)
-      (call_expression (identifier) (argument_list))
-      (call_expression (identifier) (argument_list)))
+      (block
+        (call_expression (identifier) (argument_list))
+        (call_expression (identifier) (argument_list))))
     (else_clause
-      (call_expression (identifier) (argument_list)))))
+      (block
+        (call_expression (identifier) (argument_list))))))
 
 
 ==============================
@@ -149,17 +157,21 @@ end
     (finally_clause))
 
   (try_statement
-    (call_expression (identifier) (argument_list (identifier)))
+    (block
+      (call_expression (identifier) (argument_list (identifier))))
     (catch_clause
-      (call_expression
-        (identifier)
-        (argument_list
-          (call_expression (identifier) (argument_list (identifier) (integer_literal)))))))
+      (block
+        (call_expression
+          (identifier)
+          (argument_list
+            (call_expression (identifier) (argument_list (identifier) (integer_literal))))))))
 
   (try_statement
-    (call_expression (identifier) (argument_list (identifier)))
+    (block
+      (call_expression (identifier) (argument_list (identifier))))
     (finally_clause
-      (call_expression (identifier) (argument_list (identifier)))))
+      (block
+        (call_expression (identifier) (argument_list (identifier))))))
 
   (try_statement
     (line_comment)
@@ -200,21 +212,24 @@ end
       (identifier)
       (operator)
       (identifier))
-    (call_expression (identifier) (argument_list (identifier))))
+    (block
+      (call_expression (identifier) (argument_list (identifier)))))
 
   (for_statement
     (for_binding
       (identifier)
       (operator)
       (vector_expression (integer_literal) (integer_literal) (integer_literal)))
-    (call_expression (identifier) (argument_list (identifier))))
+    (block
+      (call_expression (identifier) (argument_list (identifier)))))
 
   (for_statement
     (for_binding
       (tuple_expression (identifier) (identifier))
       (operator)
       (identifier))
-    (call_expression (identifier) (argument_list (identifier) (identifier)))))
+    (block
+      (call_expression (identifier) (argument_list (identifier) (identifier))))))
 
 
 ==============================
@@ -235,11 +250,13 @@ end
   (assignment (identifier) (operator) (integer_literal))
   (for_statement
     (for_binding (identifier) (operator) (identifier))
-    (identifier))
+    (block
+      (identifier)))
   (for_statement
     (for_binding (identifier) (operator) (identifier))
     (for_binding (identifier) (operator) (identifier))
-    (identifier)))
+    (block
+      (identifier))))
 
 
 ==============================
@@ -263,13 +280,15 @@ while a(); b(); end
 
   (while_statement
     (binary_expression (identifier) (operator) (integer_literal))
-    (call_expression (identifier) (argument_list (identifier)))
-    (continue_statement)
-    (break_statement))
+    (block
+      (call_expression (identifier) (argument_list (identifier)))
+      (continue_statement)
+      (break_statement)))
 
   (while_statement
     (call_expression (identifier) (argument_list))
-    (call_expression (identifier) (argument_list))))
+    (block
+      (call_expression (identifier) (argument_list)))))
 
 
 ==============================
@@ -420,7 +439,8 @@ local function bar() 4 end
     (function_definition
       (signature
         (call_expression (identifier) (argument_list)))
-        (integer_literal))))
+        (block
+          (integer_literal)))))
 
 
 ===============================
@@ -450,4 +470,5 @@ global function bar() 4 end
     (function_definition
       (signature
         (call_expression (identifier) (argument_list)))
-        (integer_literal))))
+        (block
+          (integer_literal)))))
