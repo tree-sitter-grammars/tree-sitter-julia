@@ -31,5 +31,15 @@
     "links": {
       "repository": "https://github.com/tree-sitter-grammars/tree-sitter-julia"
     }
+  },
+  "bindings": {
+    "rust": false,
+    "node": false,
+    "c": false,
+    "python": false,
+    "go": false,
+    "java": false,
+    "swift": false,
+    "zig": false
   }
 }
