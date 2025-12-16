@@ -129,7 +129,7 @@ const KEYWORDS = choice(
   'end',
 );
 
-module.exports = grammar({
+export default grammar({
   name: 'julia',
 
   word: $ => $._word_identifier,
