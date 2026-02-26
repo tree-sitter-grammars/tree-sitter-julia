@@ -1,17 +1,18 @@
 {
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/config.schema.json",
   "grammars": [
     {
       "name": "julia",
       "camelcase": "Julia",
-      "path": ".",
       "scope": "source.julia",
-      "injection-regex": "^(jl|julia)$",
+      "path": ".",
       "file-types": [
         "jl"
       ],
       "highlights": "queries/highlights.scm",
       "injections": "queries/injections.scm",
-      "locals": "queries/locals.scm"
+      "locals": "queries/locals.scm",
+      "injection-regex": "^(jl|julia)$"
     }
   ],
   "metadata": {
@@ -33,12 +34,12 @@
     }
   },
   "bindings": {
-    "rust": false,
-    "node": false,
     "c": false,
-    "python": false,
     "go": false,
     "java": false,
+    "node": false,
+    "python": false,
+    "rust": false,
     "swift": false,
     "zig": false
   }
