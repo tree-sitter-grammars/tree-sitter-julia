@@ -1,0 +1,921 @@
+// Julia grammar for tree-sitter (native DSL).
+// Translated from grammar.js.
+
+let PREC = {
+    afunc: 10,
+    pair: 11,
+    conditional: 12,
+    arrow: 13,
+    lazy_or: 14,
+    lazy_and: 15,
+    where: 16,
+    comparison: 17,
+    pipe_left: 18,
+    pipe_right: 19,
+    colon: 20,
+    plus: 21,
+    times: 22,
+    rational: 23,
+    bitshift: 24,
+    prefix: 25,
+    power: 26,
+    decl: 27,
+    dot: 28,
+
+    array: -1,
+    tuple: -1,
+    assign: -2,
+    stmt: -3,
+    macro_arg: -4,
+}
+
+// Operator character lists (from OPERATORS in grammar.js).
+// Each entry feeds add_dot below to optionally accept a leading '.'.
+let OPERATORS_assignment: list_t<str_t> = ["+=","-=","*=","/=","//=","\\=","^=","%=","<<=",">>=",">>>=","|=","&=","−=","÷=","⊻=","≔","⩴","≕"]
+let OPERATORS_arrow: list_t<str_t> = ["<--","-->","<-->","←","→","↔","↚","↛","↞","↠","↢","↣","↦","↤","↮","⇎","⇍","⇏","⇐","⇒","⇔","⇴","⇶","⇷","⇸","⇹","⇺","⇻","⇼","⇽","⇾","⇿","⟵","⟶","⟷","⟹","⟺","⟻","⟼","⟽","⟾","⟿","⤀","⤁","⤂","⤃","⤄","⤅","⤆","⤇","⤌","⤍","⤎","⤏","⤐","⤑","⤔","⤕","⤖","⤗","⤘","⤝","⤞","⤟","⤠","⥄","⥅","⥆","⥇","⥈","⥊","⥋","⥎","⥐","⥒","⥓","⥖","⥗","⥚","⥛","⥞","⥟","⥢","⥤","⥦","⥧","⥨","⥩","⥪","⥫","⥬","⥭","⥰","⧴","⬱","⬰","⬲","⬳","⬴","⬵","⬶","⬷","⬸","⬹","⬺","⬻","⬼","⬽","⬾","⬿","⭀","⭁","⭂","⭃","⥷","⭄","⥺","⭇","⭈","⭉","⭊","⭋","⭌","￩","￫","⇜","⇝","↜","↝","↩","↪","↫","↬","↼","↽","⇀","⇁","⇄","⇆","⇇","⇉","⇋","⇌","⇚","⇛","⇠","⇢","↷","↶","↺","↻"]
+let OPERATORS_comparison: list_t<str_t> = [">","<",">=","<=","==","===","!=","!==","≥","≤","≡","≠","≢","∈","∉","∋","∌","⊆","⊈","⊂","⊄","⊊","∝","∊","∍","∥","∦","∷","∺","∻","∽","∾","≁","≃","≂","≄","≅","≆","≇","≈","≉","≊","≋","≌","≍","≎","≐","≑","≒","≓","≖","≗","≘","≙","≚","≛","≜","≝","≞","≟","≣","≦","≧","≨","≩","≪","≫","≬","≭","≮","≯","≰","≱","≲","≳","≴","≵","≶","≷","≸","≹","≺","≻","≼","≽","≾","≿","⊀","⊁","⊃","⊅","⊇","⊉","⊋","⊏","⊐","⊑","⊒","⊜","⊩","⊬","⊮","⊰","⊱","⊲","⊳","⊴","⊵","⊶","⊷","⋍","⋐","⋑","⋕","⋖","⋗","⋘","⋙","⋚","⋛","⋜","⋝","⋞","⋟","⋠","⋡","⋢","⋣","⋤","⋥","⋦","⋧","⋨","⋩","⋪","⋫","⋬","⋭","⋲","⋳","⋴","⋵","⋶","⋷","⋸","⋹","⋺","⋻","⋼","⋽","⋾","⋿","⟈","⟉","⟒","⦷","⧀","⧁","⧡","⧣","⧤","⧥","⩦","⩧","⩪","⩫","⩬","⩭","⩮","⩯","⩰","⩱","⩲","⩳","⩵","⩶","⩷","⩸","⩹","⩺","⩻","⩼","⩽","⩾","⩿","⪀","⪁","⪂","⪃","⪄","⪅","⪆","⪇","⪈","⪉","⪊","⪋","⪌","⪍","⪎","⪏","⪐","⪑","⪒","⪓","⪔","⪕","⪖","⪗","⪘","⪙","⪚","⪛","⪜","⪝","⪞","⪟","⪠","⪡","⪢","⪣","⪤","⪥","⪦","⪧","⪨","⪩","⪪","⪫","⪬","⪭","⪮","⪯","⪰","⪱","⪲","⪳","⪴","⪵","⪶","⪷","⪸","⪹","⪺","⪻","⪼","⪽","⪾","⪿","⫀","⫁","⫂","⫃","⫄","⫅","⫆","⫇","⫈","⫉","⫊","⫋","⫌","⫍","⫎","⫏","⫐","⫑","⫒","⫓","⫔","⫕","⫖","⫗","⫘","⫙","⫷","⫸","⫹","⫺","⊢","⊣","⟂","⫪","⫫"]
+let OPERATORS_ellipsis: list_t<str_t> = ["…","⁝","⋮","⋱","⋰","⋯"]
+let OPERATORS_plus: list_t<str_t> = ["++","|","−","¦","⊕","⊖","⊞","⊟","∪","∨","⊔","∔","∸","≏","⊎","⊻","⊽","⋎","⋓","⟇","⧺","⧻","⨈","⨢","⨣","⨤","⨥","⨦","⨧","⨨","⨩","⨪","⨫","⨬","⨭","⨮","⨹","⨺","⩁","⩂","⩅","⩊","⩌","⩏","⩐","⩒","⩔","⩖","⩗","⩛","⩝","⩡","⩢","⩣"]
+let OPERATORS_times: list_t<str_t> = ["*","/","%","&","\\","⌿","÷","·","·","⋅","∘","×","∩","∧","⊗","⊘","⊙","⊚","⊛","⊠","⊡","⊓","∗","∙","∤","⅋","≀","⊼","⋄","⋆","⋇","⋉","⋊","⋋","⋌","⋏","⋒","⟑","⦸","⦼","⦾","⦿","⧶","⧷","⨇","⨰","⨱","⨲","⨳","⨴","⨵","⨶","⨷","⨸","⨻","⨼","⨽","⩀","⩃","⩄","⩋","⩍","⩎","⩑","⩓","⩕","⩘","⩚","⩜","⩞","⩟","⩠","⫛","⊍","▷","⨝","⟕","⟖","⟗","⨟"]
+let OPERATORS_bitshift: list_t<str_t> = ["<<",">>",">>>"]
+let OPERATORS_power: list_t<str_t> = ["^","↑","↓","⇵","⟰","⟱","⤈","⤉","⤊","⤋","⤒","⤓","⥉","⥌","⥍","⥏","⥑","⥔","⥕","⥘","⥙","⥜","⥝","⥠","⥡","⥣","⥥","⥮","⥯","￪","￬"]
+let OPERATORS_unary: list_t<str_t> = ["!","¬","√","∛","∜"]
+let OPERATORS_unary_plus: list_t<str_t> = ["+","-","±","∓"]
+
+// `addDot` from grammar.js: optional leading '.' fused with the operator
+// into a single token. Single-element calls go through the same shape; the
+// roundtrip test normalizes 1-element choices.
+macro add_dot(items: list_t<str_t>) rule_t {
+    token(seq(optional("."), choice(for (op: str_t) in items { op })))
+}
+
+macro add_dot_one(op: str_t) rule_t {
+    token(seq(optional("."), op))
+}
+
+macro sep1(separator: rule_t, item: rule_t) rule_t {
+    seq(item, repeat(seq(separator, item)))
+}
+
+macro sep(separator: rule_t, item: rule_t) rule_t {
+    optional(sep1(separator, item))
+}
+
+// Used by binary_expression below: a single match arm shaped
+// `prec.X(p, seq(_expression, alias(op, operator), _expression))`.
+macro left_binop(p: int_t, op: rule_t) rule_t {
+    prec_left(p, seq(_expression, alias(op, operator), _expression))
+}
+
+macro right_binop(p: int_t, op: rule_t) rule_t {
+    prec_right(p, seq(_expression, alias(op, operator), _expression))
+}
+
+// Quotable keywords (KEYWORDS in grammar.js).
+let KEYWORD_CHOICE: rule_t = choice(
+    "baremodule", "module", "abstract", "primitive", "mutable", "struct",
+    "quote", "let", "if", "else", "elseif", "try", "catch", "finally",
+    "for", "while", "break", "continue", "using", "import", "const",
+    "global", "local", "end",
+)
+
+// ESCAPE_SEQUENCE: shared between escape_sequence rule and character_literal.
+let ESCAPE_SEQUENCE: rule_t = token(seq(
+    "\\",
+    choice(
+        regexp(r"[^uUx0-7]"),
+        regexp(r"[uU][0-9a-fA-F]{1,6}"),
+        regexp(r"[0-7]{1,3}"),
+        regexp(r"x[0-9a-fA-F]{2}"),
+    ),
+))
+
+grammar {
+    language: "julia",
+    word: _word_identifier,
+
+    inline: [_block_form, _terminator, _definition, _statement, _operation],
+
+    externals: [
+        _block_comment_rest,
+        _immediate_paren,
+        _immediate_bracket,
+        _immediate_brace,
+        _immediate_string_start,
+        _immediate_command_start,
+        _content_cmd_1,
+        _content_cmd_1_raw,
+        _content_cmd_3,
+        _content_cmd_3_raw,
+        _content_str_1,
+        _content_str_1_raw,
+        _content_str_3,
+        _content_str_3_raw,
+        _end_cmd,
+        _end_str,
+    ],
+
+    conflicts: [
+        [juxtaposition_expression, _primary_expression],
+        [juxtaposition_expression, _expression],
+        [matrix_row, comprehension_expression],
+        [parenthesized_expression, tuple_expression],
+    ],
+
+    supertypes: [_expression, _statement, _definition],
+
+    extras: [regexp(r"\s"), line_comment, block_comment],
+}
+
+// ---------------------------------------------------------------------------
+// Top-level
+// ---------------------------------------------------------------------------
+
+rule source_file {
+    optional(seq(sep1(_terminator, _block_form), optional(_terminator)))
+}
+
+rule block {
+    seq(sep1(_terminator, _block_form), optional(_terminator))
+}
+
+rule _block_form { choice(_expression, assignment, open_tuple) }
+
+rule _bracket_form { choice(_expression, alias(_closed_assignment, assignment)) }
+
+rule open_tuple {
+    prec(PREC.tuple, seq(_expression, repeat1(seq(",", _expression))))
+}
+
+// assignments inside blocks
+rule assignment {
+    prec_right(PREC.assign, seq(
+        choice(_primary_expression, open_tuple, _operation, operator),
+        alias("=", operator),
+        _block_form,
+    ))
+}
+
+// assignments inside brackets
+rule _closed_assignment {
+    prec_right(PREC.assign, seq(
+        choice(_primary_expression, _operation, operator),
+        alias("=", operator),
+        _bracket_form,
+    ))
+}
+
+rule _expression {
+    choice(
+        _definition,
+        _statement,
+        _primary_expression,
+        _operation,
+        compound_assignment_expression,
+        macrocall_expression,
+        arrow_function_expression,
+        juxtaposition_expression,
+        ternary_expression,
+        operator,
+        integer_literal,
+        float_literal,
+        prec(-1, alias("begin", identifier)),
+    )
+}
+
+// ---------------------------------------------------------------------------
+// Definitions
+// ---------------------------------------------------------------------------
+
+rule _definition {
+    choice(
+        module_definition,
+        abstract_definition,
+        primitive_definition,
+        struct_definition,
+        function_definition,
+        macro_definition,
+    )
+}
+
+rule module_definition {
+    seq(
+        choice("module", "baremodule"),
+        field(name, choice(identifier, interpolation_expression)),
+        optional(_terminator),
+        optional(block),
+        "end",
+    )
+}
+
+rule type_head {
+    prec(PREC.stmt, choice(_primary_expression, binary_expression))
+}
+
+rule abstract_definition { seq("abstract", "type", type_head, "end") }
+
+rule primitive_definition { seq("primitive", "type", type_head, integer_literal, "end") }
+
+rule struct_definition {
+    seq(
+        optional("mutable"),
+        "struct",
+        type_head,
+        optional(_terminator),
+        optional(block),
+        "end",
+    )
+}
+
+rule signature {
+    prec(PREC.stmt, choice(
+        identifier,
+        call_expression,
+        alias(tuple_expression, argument_list),
+        typed_expression,
+        where_expression,
+    ))
+}
+
+rule function_definition {
+    seq("function", signature, optional(_terminator), optional(block), "end")
+}
+
+rule macro_definition {
+    seq("macro", signature, optional(_terminator), optional(block), "end")
+}
+
+// ---------------------------------------------------------------------------
+// Statements
+// ---------------------------------------------------------------------------
+
+rule _statement {
+    choice(
+        compound_statement,
+        quote_statement,
+        let_statement,
+        if_statement,
+        try_statement,
+        for_statement,
+        while_statement,
+        break_statement,
+        continue_statement,
+        return_statement,
+        const_statement,
+        global_statement,
+        local_statement,
+        export_statement,
+        import_statement,
+        public_statement,
+        using_statement,
+    )
+}
+
+rule compound_statement { seq("begin", optional(_terminator), optional(block), "end") }
+
+rule quote_statement { seq("quote", optional(_terminator), optional(block), "end") }
+
+rule let_statement {
+    seq("let", sep(",", _bracket_form), _terminator, optional(block), "end")
+}
+
+rule if_statement {
+    seq(
+        "if",
+        field(condition, _expression),
+        optional(_terminator),
+        optional(block),
+        field(alternative, repeat(elseif_clause)),
+        field(alternative, optional(else_clause)),
+        "end",
+    )
+}
+
+rule elseif_clause {
+    seq("elseif", field(condition, _expression), optional(_terminator), optional(block))
+}
+
+rule else_clause { seq("else", optional(_terminator), optional(block)) }
+
+rule try_statement {
+    seq(
+        "try",
+        optional(_terminator),
+        optional(block),
+        choice(
+            seq(catch_clause, optional(else_clause), optional(finally_clause)),
+            seq(finally_clause, optional(catch_clause)),
+        ),
+        "end",
+    )
+}
+
+rule catch_clause {
+    prec(1, seq("catch", optional(identifier), optional(_terminator), optional(block)))
+}
+
+rule finally_clause { seq("finally", optional(_terminator), optional(block)) }
+
+rule for_statement {
+    seq("for", sep1(",", for_binding), optional(_terminator), optional(block), "end")
+}
+
+rule while_statement {
+    seq("while", field(condition, _expression), optional(_terminator), optional(block), "end")
+}
+
+rule break_statement { "break" }
+
+rule continue_statement { "continue" }
+
+rule return_statement { prec_right(PREC.stmt, seq("return", optional(_block_form))) }
+
+rule const_statement { prec_right(PREC.stmt, seq("const", _block_form)) }
+
+rule global_statement { prec_right(PREC.stmt, seq("global", _block_form)) }
+
+rule local_statement { prec_right(PREC.stmt, seq("local", _block_form)) }
+
+rule import_alias { seq(_importable, "as", _exportable) }
+
+rule import_path {
+    seq(token(repeat1(".")), choice(identifier, _scoped_identifier))
+}
+
+rule _exportable {
+    choice(
+        identifier,
+        macro_identifier,
+        operator,
+        interpolation_expression,
+        seq("(", _exportable, ")"),
+    )
+}
+
+rule _importable {
+    choice(
+        _exportable,
+        alias(_scoped_identifier, import_path),
+        import_path,
+    )
+}
+
+rule _import_list {
+    prec_right(0, sep1(",", choice(_importable, import_alias)))
+}
+
+rule selected_import {
+    seq(_importable, token_immediate(":"), _import_list)
+}
+
+rule export_statement { seq("export", prec_right(0, sep1(",", _exportable))) }
+
+rule public_statement { seq("public", prec_right(0, sep1(",", _exportable))) }
+
+rule import_statement {
+    seq("import", choice(_import_list, selected_import))
+}
+
+rule using_statement {
+    seq("using", choice(_import_list, selected_import))
+}
+
+// ---------------------------------------------------------------------------
+// Primary expressions
+// ---------------------------------------------------------------------------
+
+rule _primary_expression {
+    choice(
+        identifier,
+        boolean_literal,
+        curly_expression,
+        parenthesized_expression,
+        tuple_expression,
+        _array,
+        _string,
+        adjoint_expression,
+        broadcast_call_expression,
+        call_expression,
+        alias(_closed_macrocall_expression, macrocall_expression),
+        parametrized_type_expression,
+        field_expression,
+        index_expression,
+        interpolation_expression,
+        quote_expression,
+    )
+}
+
+rule _array { choice(comprehension_expression, matrix_expression, vector_expression) }
+
+rule comprehension_expression {
+    prec(PREC.array, seq(
+        "[",
+        _bracket_form,
+        optional(_terminator),
+        for_clause,
+        repeat(choice(for_clause, if_clause)),
+        "]",
+    ))
+}
+
+rule generator {
+    seq(_bracket_form, for_clause, repeat(choice(for_clause, if_clause)))
+}
+
+rule if_clause { seq("if", _expression) }
+
+rule for_clause { prec_right(0, seq("for", sep1(",", for_binding))) }
+
+rule for_binding {
+    prec(1, seq(
+        optional("outer"),
+        choice(identifier, tuple_expression, typed_expression, interpolation_expression),
+        alias(choice("in", "=", "∈"), operator),
+        _expression,
+    ))
+}
+
+rule matrix_expression {
+    prec(PREC.array, seq(
+        "[",
+        matrix_row,
+        repeat(seq(_terminator, matrix_row)),
+        optional(_terminator),
+        "]",
+    ))
+}
+
+rule matrix_row { repeat1(prec(PREC.array, _bracket_form)) }
+
+rule vector_expression {
+    seq("[", sep(",", _bracket_form), optional(","), "]")
+}
+
+rule parenthesized_expression {
+    prec_dynamic(1, seq(
+        "(",
+        sep1(_semicolon, choice(_bracket_form, generator)),
+        optional(_semicolon),
+        ")",
+    ))
+}
+
+rule tuple_expression {
+    seq(
+        "(",
+        optional(_semicolon),
+        sep(choice(",", _semicolon), choice(_bracket_form, generator)),
+        optional(","),
+        ")",
+    )
+}
+
+rule curly_expression {
+    seq("{", sep(",", _bracket_form), optional(","), "}")
+}
+
+rule adjoint_expression { seq(_primary_expression, token_immediate("'")) }
+
+rule field_expression {
+    prec(PREC.dot, seq(
+        field(value, _primary_expression),
+        token_immediate("."),
+        choice(identifier, interpolation_expression, quote_expression, _string),
+    ))
+}
+
+rule index_expression {
+    seq(_primary_expression, _immediate_bracket, _array)
+}
+
+rule parametrized_type_expression {
+    seq(_primary_expression, _immediate_brace, curly_expression)
+}
+
+rule call_expression {
+    seq(
+        choice(_primary_expression, operator),
+        _immediate_paren,
+        alias(tuple_expression, argument_list),
+        optional(do_clause),
+    )
+}
+
+rule broadcast_call_expression {
+    seq(
+        _primary_expression,
+        token_immediate("."),
+        _immediate_paren,
+        alias(tuple_expression, argument_list),
+        optional(do_clause),
+    )
+}
+
+rule _qualified_macro_identifier {
+    seq(_primary_expression, token_immediate("."), macro_identifier)
+}
+
+rule _macro_head {
+    choice(alias(_qualified_macro_identifier, field_expression), macro_identifier)
+}
+
+rule _closed_macrocall_expression {
+    seq(
+        _macro_head,
+        choice(
+            seq(_immediate_brace, curly_expression),
+            seq(_immediate_bracket, _array),
+            seq(_immediate_paren, alias(tuple_expression, argument_list), optional(do_clause)),
+        ),
+    )
+}
+
+rule macrocall_expression {
+    prec_right(0, seq(_macro_head, optional(macro_argument_list)))
+}
+
+rule macro_argument_list {
+    prec_left(0, repeat1(prec(PREC.macro_arg, _block_form)))
+}
+
+rule do_clause {
+    seq("do", sep(",", _bracket_form), _terminator, optional(block), "end")
+}
+
+rule interpolation_expression {
+    prec_right(PREC.prefix, seq(
+        "$",
+        choice(
+            integer_literal,
+            float_literal,
+            identifier,
+            curly_expression,
+            parenthesized_expression,
+            tuple_expression,
+            _array,
+            _string,
+        ),
+    ))
+}
+
+rule quote_expression {
+    prec_right(PREC.prefix, seq(
+        ":",
+        choice(
+            integer_literal,
+            float_literal,
+            _string,
+            identifier,
+            operator,
+            seq(_immediate_brace, curly_expression),
+            seq(_immediate_bracket, _array),
+            seq(_immediate_paren, choice(
+                parenthesized_expression,
+                tuple_expression,
+                seq("(", alias(
+                    choice(
+                        "::", ":=", ".=", "=",
+                        _assignment_operator,
+                        _lazy_or_operator,
+                        _lazy_and_operator,
+                        _syntactic_operator,
+                    ),
+                    operator,
+                ), ")"),
+            )),
+            alias(
+                choice(
+                    _assignment_operator,
+                    _lazy_or_operator,
+                    _lazy_and_operator,
+                    _syntactic_operator,
+                ),
+                operator,
+            ),
+            alias(token_immediate(KEYWORD_CHOICE), identifier),
+        ),
+    ))
+}
+
+// ---------------------------------------------------------------------------
+// Operations
+// ---------------------------------------------------------------------------
+
+rule _operation {
+    choice(
+        unary_expression,
+        binary_expression,
+        range_expression,
+        splat_expression,
+        typed_expression,
+        unary_typed_expression,
+        where_expression,
+    )
+}
+
+rule binary_expression {
+    choice(
+        right_binop(PREC.pair, _pair_operator),
+        right_binop(PREC.arrow, _arrow_operator),
+        left_binop(PREC.lazy_or, _lazy_or_operator),
+        left_binop(PREC.lazy_and, _lazy_and_operator),
+        left_binop(PREC.comparison, choice("in", "isa", _comparison_operator, _type_order_operator)),
+        right_binop(PREC.pipe_left, _pipe_left_operator),
+        left_binop(PREC.pipe_right, _pipe_right_operator),
+        left_binop(PREC.colon, _ellipsis_operator),
+        left_binop(PREC.plus, choice(_unary_plus_operator, _plus_operator)),
+        left_binop(PREC.times, _times_operator),
+        left_binop(PREC.rational, _rational_operator),
+        left_binop(PREC.bitshift, _bitshift_operator),
+        left_binop(PREC.power, _power_operator),
+    )
+}
+
+rule unary_expression {
+    prec_right(PREC.prefix, seq(
+        alias(
+            choice(_tilde_operator, _type_order_operator, _unary_operator, _unary_plus_operator),
+            operator,
+        ),
+        _expression,
+    ))
+}
+
+rule range_expression {
+    prec_left(PREC.colon, seq(_expression, token_immediate(":"), _expression))
+}
+
+rule splat_expression { prec(PREC.colon, seq(_expression, "...")) }
+
+rule ternary_expression {
+    prec_right(PREC.conditional, seq(
+        _expression, "?", _bracket_form, ":", _bracket_form,
+    ))
+}
+
+rule typed_expression {
+    prec(PREC.decl, seq(_expression, "::", _primary_expression))
+}
+
+rule unary_typed_expression {
+    prec_right(PREC.prefix, seq("::", _primary_expression))
+}
+
+rule arrow_function_expression {
+    prec_right(PREC.afunc, seq(
+        choice(identifier, alias(tuple_expression, argument_list), typed_expression),
+        "->",
+        _bracket_form,
+    ))
+}
+
+rule juxtaposition_expression {
+    prec_left(0, seq(
+        choice(integer_literal, float_literal, adjoint_expression),
+        _primary_expression,
+    ))
+}
+
+rule compound_assignment_expression {
+    prec_right(PREC.assign, seq(
+        _primary_expression,
+        alias(choice(_assignment_operator, _tilde_operator), operator),
+        _expression,
+    ))
+}
+
+rule where_expression {
+    prec_left(PREC.where, seq(_expression, "where", _expression))
+}
+
+// ---------------------------------------------------------------------------
+// Tokens
+// ---------------------------------------------------------------------------
+
+rule macro_identifier {
+    seq("@", choice(
+        identifier,
+        operator,
+        alias(_syntactic_operator, operator),
+        alias(_scoped_identifier, field_expression),
+    ))
+}
+
+rule _scoped_identifier {
+    seq(
+        choice(identifier, interpolation_expression),
+        repeat1(seq(token_immediate("."), choice(identifier, interpolation_expression))),
+    )
+}
+
+// Resolved at JS load time from OPERATORS; inlined verbatim. See grammar.js
+// `_word_identifier` for the construction.
+rule _word_identifier {
+    regexp(r#"[_\p{XID_Start}°∀-∇∎-∑∫-∳&&[^0-9#*]][^"'`\s\.\-\[\]#$,:;@~(){}+==*=/=//=\\=^=%=<<=>>=>>>=|=&=−=÷=⊻=≔⩴≕<><>←→↔↚↛↞↠↢↣↦↤↮⇎⇍⇏⇐⇒⇔⇴⇶⇷⇸⇹⇺⇻⇼⇽⇾⇿⟵⟶⟷⟹⟺⟻⟼⟽⟾⟿⤀⤁⤂⤃⤄⤅⤆⤇⤌⤍⤎⤏⤐⤑⤔⤕⤖⤗⤘⤝⤞⤟⤠⥄⥅⥆⥇⥈⥊⥋⥎⥐⥒⥓⥖⥗⥚⥛⥞⥟⥢⥤⥦⥧⥨⥩⥪⥫⥬⥭⥰⧴⬱⬰⬲⬳⬴⬵⬶⬷⬸⬹⬺⬻⬼⬽⬾⬿⭀⭁⭂⭃⥷⭄⥺⭇⭈⭉⭊⭋⭌￩￫⇜⇝↜↝↩↪↫↬↼↽⇀⇁⇄⇆⇇⇉⇋⇌⇚⇛⇠⇢↷↶↺↻><>=<=========≥≤≡≠≢∈∉∋∌⊆⊈⊂⊄⊊∝∊∍∥∦∷∺∻∽∾≁≃≂≄≅≆≇≈≉≊≋≌≍≎≐≑≒≓≖≗≘≙≚≛≜≝≞≟≣≦≧≨≩≪≫≬≭≮≯≰≱≲≳≴≵≶≷≸≹≺≻≼≽≾≿⊀⊁⊃⊅⊇⊉⊋⊏⊐⊑⊒⊜⊩⊬⊮⊰⊱⊲⊳⊴⊵⊶⊷⋍⋐⋑⋕⋖⋗⋘⋙⋚⋛⋜⋝⋞⋟⋠⋡⋢⋣⋤⋥⋦⋧⋨⋩⋪⋫⋬⋭⋲⋳⋴⋵⋶⋷⋸⋹⋺⋻⋼⋽⋾⋿⟈⟉⟒⦷⧀⧁⧡⧣⧤⧥⩦⩧⩪⩫⩬⩭⩮⩯⩰⩱⩲⩳⩵⩶⩷⩸⩹⩺⩻⩼⩽⩾⩿⪀⪁⪂⪃⪄⪅⪆⪇⪈⪉⪊⪋⪌⪍⪎⪏⪐⪑⪒⪓⪔⪕⪖⪗⪘⪙⪚⪛⪜⪝⪞⪟⪠⪡⪢⪣⪤⪥⪦⪧⪨⪩⪪⪫⪬⪭⪮⪯⪰⪱⪲⪳⪴⪵⪶⪷⪸⪹⪺⪻⪼⪽⪾⪿⫀⫁⫂⫃⫄⫅⫆⫇⫈⫉⫊⫋⫌⫍⫎⫏⫐⫑⫒⫓⫔⫕⫖⫗⫘⫙⫷⫸⫹⫺⊢⊣⟂⫪⫫…⁝⋮⋱⋰⋯++|−¦⊕⊖⊞⊟∪∨⊔∔∸≏⊎⊻⊽⋎⋓⟇⧺⧻⨈⨢⨣⨤⨥⨦⨧⨨⨩⨪⨫⨬⨭⨮⨹⨺⩁⩂⩅⩊⩌⩏⩐⩒⩔⩖⩗⩛⩝⩡⩢⩣*/%&\\⌿÷··⋅∘×∩∧⊗⊘⊙⊚⊛⊠⊡⊓∗∙∤⅋≀⊼⋄⋆⋇⋉⋊⋋⋌⋏⋒⟑⦸⦼⦾⦿⧶⧷⨇⨰⨱⨲⨳⨴⨵⨶⨷⨸⨻⨼⨽⩀⩃⩄⩋⩍⩎⩑⩓⩕⩘⩚⩜⩞⩟⩠⫛⊍▷⨝⟕⟖⟗⨟<<>>>>>^↑↓⇵⟰⟱⤈⤉⤊⤋⤒⤓⥉⥌⥍⥏⥑⥔⥕⥘⥙⥜⥝⥠⥡⥣⥥⥮⥯￪￬¬√∛∜+±∓]*"#)
+}
+
+rule identifier { _word_identifier }
+
+// ---------------------------------------------------------------------------
+// Literals
+// ---------------------------------------------------------------------------
+
+rule boolean_literal { choice("true", "false") }
+
+rule integer_literal {
+    choice(
+        token(seq("0b", regexp(r"[01]([01]|_[01])*"))),
+        token(seq("0o", regexp(r"[0-7]([0-7]|_[0-7])*"))),
+        token(seq("0x", regexp(r"[0-9a-fA-F]([0-9a-fA-F]|_[0-9a-fA-F])*"))),
+        regexp(r"[0-9]([0-9]|_[0-9])*"),
+    )
+}
+
+rule float_literal {
+    choice(
+        // leading_period: token(seq('.', dec, optional(exponent)))
+        token(seq(".", regexp(r"[0-9]([0-9]|_[0-9])*"), optional(regexp(r"[eEf][+-]?\d+")))),
+        // trailing_period: dec then immediate ('.', optional(dec), optional(exponent))
+        seq(
+            regexp(r"[0-9]([0-9]|_[0-9])*"),
+            token_immediate(seq(".", optional(regexp(r"[0-9]([0-9]|_[0-9])*")), optional(regexp(r"[eEf][+-]?\d+")))),
+        ),
+        // just_exponent: token(seq(dec, exponent))
+        token(seq(regexp(r"[0-9]([0-9]|_[0-9])*"), regexp(r"[eEf][+-]?\d+"))),
+        // hex_float
+        token(seq(
+            choice(
+                seq("0x", regexp(r"[0-9a-fA-F]([0-9a-fA-F]|_[0-9a-fA-F])*"), optional("."), optional(regexp(r"[0-9a-fA-F]([0-9a-fA-F]|_[0-9a-fA-F])*"))),
+                seq("0x.", regexp(r"[0-9a-fA-F]([0-9a-fA-F]|_[0-9a-fA-F])*")),
+            ),
+            regexp(r"p[+-]?\d+"),
+        )),
+    )
+}
+
+rule _string {
+    choice(
+        character_literal,
+        string_literal,
+        command_literal,
+        prefixed_string_literal,
+        prefixed_command_literal,
+    )
+}
+
+rule escape_sequence { ESCAPE_SEQUENCE }
+
+rule character_literal {
+    token(seq("'", choice(regexp(r"[^'\\]"), ESCAPE_SEQUENCE), "'"))
+}
+
+rule _delimiter_str_1 { "\"" }
+rule _delimiter_str_3 { "\"\"\"" }
+rule _delimiter_cmd_1 { "`" }
+rule _delimiter_cmd_3 { "```" }
+
+rule string_literal {
+    choice(
+        seq(
+            _delimiter_str_1,
+            repeat(choice(alias(_content_str_1, content), string_interpolation, escape_sequence)),
+            _end_str,
+        ),
+        seq(
+            _delimiter_str_3,
+            repeat(choice(alias(_content_str_3, content), string_interpolation, escape_sequence)),
+            _end_str,
+        ),
+    )
+}
+
+rule command_literal {
+    choice(
+        seq(
+            _delimiter_cmd_1,
+            repeat(choice(alias(_content_cmd_1, content), string_interpolation, escape_sequence)),
+            _end_cmd,
+        ),
+        seq(
+            _delimiter_cmd_3,
+            repeat(choice(alias(_content_cmd_3, content), string_interpolation, escape_sequence)),
+            _end_cmd,
+        ),
+    )
+}
+
+rule prefixed_string_literal {
+    prec_left(0, seq(
+        field(prefix, identifier),
+        _immediate_string_start,
+        choice(
+            seq(
+                _delimiter_str_1,
+                repeat(choice(alias(_content_str_1_raw, content), escape_sequence)),
+                _end_str,
+            ),
+            seq(
+                _delimiter_str_3,
+                repeat(choice(alias(_content_str_3_raw, content), escape_sequence)),
+                _end_str,
+            ),
+        ),
+        optional(field(suffix, identifier)),
+    ))
+}
+
+rule prefixed_command_literal {
+    prec_left(0, seq(
+        field(prefix, identifier),
+        _immediate_command_start,
+        choice(
+            seq(
+                _delimiter_cmd_1,
+                repeat(choice(alias(_content_cmd_1_raw, content), escape_sequence)),
+                _end_cmd,
+            ),
+            seq(
+                _delimiter_cmd_3,
+                repeat(choice(alias(_content_cmd_3_raw, content), escape_sequence)),
+                _end_cmd,
+            ),
+        ),
+        optional(field(suffix, identifier)),
+    ))
+}
+
+rule string_interpolation {
+    seq("$", choice(identifier, seq(_immediate_paren, "(", _bracket_form, ")")))
+}
+
+// ---------------------------------------------------------------------------
+// Operators
+// ---------------------------------------------------------------------------
+
+rule operator {
+    choice(
+        _pair_operator,
+        _arrow_operator,
+        _comparison_operator,
+        _pipe_left_operator,
+        _pipe_right_operator,
+        _ellipsis_operator,
+        ":",
+        _plus_operator,
+        _times_operator,
+        _rational_operator,
+        _bitshift_operator,
+        _power_operator,
+        _tilde_operator,
+        _type_order_operator,
+        _unary_operator,
+        _unary_plus_operator,
+    )
+}
+
+rule _assignment_operator { choice(":=", "$=", ".=", add_dot(OPERATORS_assignment)) }
+
+rule _pair_operator { add_dot_one("=>") }
+
+rule _arrow_operator { add_dot(OPERATORS_arrow) }
+
+rule _lazy_or_operator { add_dot_one("||") }
+
+rule _lazy_and_operator { add_dot_one("&&") }
+
+rule _comparison_operator { add_dot(OPERATORS_comparison) }
+
+rule _pipe_right_operator { add_dot_one("|>") }
+
+rule _pipe_left_operator { add_dot_one("<|") }
+
+rule _ellipsis_operator { token(choice("..", add_dot(OPERATORS_ellipsis))) }
+
+rule _plus_operator { add_dot(OPERATORS_plus) }
+
+rule _times_operator { add_dot(OPERATORS_times) }
+
+rule _rational_operator { add_dot_one("//") }
+
+rule _bitshift_operator { add_dot(OPERATORS_bitshift) }
+
+rule _power_operator { add_dot(OPERATORS_power) }
+
+rule _tilde_operator { add_dot_one("~") }
+
+rule _type_order_operator { add_dot(["<:", ">:"]) }
+
+rule _unary_operator { add_dot(OPERATORS_unary) }
+
+rule _unary_plus_operator { add_dot(OPERATORS_unary_plus) }
+
+rule _syntactic_operator { choice("$", ".", "...", "->", "?") }
+
+rule _semicolon { seq(";", repeat(token_immediate(";"))) }
+
+rule _terminator { choice(regexp(r"\r?\n"), _semicolon) }
+
+rule block_comment { seq(regexp(r"#="), _block_comment_rest) }
+
+// FIXME (from grammar.js): seq to avoid conflicts with block_comment.
+rule line_comment { seq(regexp(r"#"), regexp(r".*")) }
