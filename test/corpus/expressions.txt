@@ -559,6 +559,9 @@ juxtaposition expressions
 x'x
 2x^2 - .3x
 2(x-1)^2 - 3(x-1)
+(a.b)u"K"
+foo()u"m"
+x[1]u"m"
 
 ---
 
@@ -621,7 +624,30 @@ x'x
         (binary_expression
           (identifier)
           (operator)
-          (integer_literal))))))
+          (integer_literal)))))
+  (juxtaposition_expression
+    (parenthesized_expression
+      (field_expression
+        (identifier)
+        (identifier)))
+    (prefixed_string_literal
+      (identifier)
+      (content)))
+  (juxtaposition_expression
+    (call_expression
+      (identifier)
+      (argument_list))
+    (prefixed_string_literal
+      (identifier)
+      (content)))
+  (juxtaposition_expression
+    (index_expression
+      (identifier)
+      (vector_expression
+        (integer_literal)))
+    (prefixed_string_literal
+      (identifier)
+      (content))))
 
 =============================
 arrow function expressions

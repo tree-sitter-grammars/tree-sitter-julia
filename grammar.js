@@ -149,6 +149,7 @@ export default grammar({
     $._immediate_brace,
     $._immediate_string_start,
     $._immediate_command_start,
+    $._immediate_prefixed_string,
     $._content_cmd_1,
     $._content_cmd_1_raw,
     $._content_cmd_3,
@@ -834,13 +835,26 @@ export default grammar({
       $._bracket_form,
     )),
 
-    juxtaposition_expression: $ => prec.left(seq(
-      choice(
-        $.integer_literal,
-        $.float_literal,
-        $.adjoint_expression,
+    juxtaposition_expression: $ => prec.left(choice(
+      seq(
+        choice(
+          $.integer_literal,
+          $.float_literal,
+          $.adjoint_expression,
+        ),
+        $._primary_expression,
       ),
-      $._primary_expression,
+      // e.g. (a.b)u"K", foo()u"m", x[1]u"m"
+      seq(
+        choice(
+          $.parenthesized_expression,
+          $.tuple_expression,
+          $.call_expression,
+          $.index_expression,
+        ),
+        $._immediate_prefixed_string,
+        $.prefixed_string_literal,
+      ),
     )),
 
     compound_assignment_expression: $ => prec.right(PREC.assign, seq(
