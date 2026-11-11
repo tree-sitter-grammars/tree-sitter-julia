@@ -3591,28 +3591,67 @@
       "type": "PREC_LEFT",
       "value": 0,
       "content": {
-        "type": "SEQ",
+        "type": "CHOICE",
         "members": [
           {
-            "type": "CHOICE",
+            "type": "SEQ",
             "members": [
               {
-                "type": "SYMBOL",
-                "name": "integer_literal"
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "integer_literal"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "float_literal"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "adjoint_expression"
+                  }
+                ]
               },
               {
                 "type": "SYMBOL",
-                "name": "float_literal"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "adjoint_expression"
+                "name": "_primary_expression"
               }
             ]
           },
           {
-            "type": "SYMBOL",
-            "name": "_primary_expression"
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "parenthesized_expression"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "tuple_expression"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "call_expression"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "index_expression"
+                  }
+                ]
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_immediate_prefixed_string"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "prefixed_string_literal"
+              }
+            ]
           }
         ]
       }
@@ -7794,6 +7833,10 @@
     {
       "type": "SYMBOL",
       "name": "_immediate_command_start"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_immediate_prefixed_string"
     },
     {
       "type": "SYMBOL",

@@ -1,5 +1,7 @@
 #include "tree_sitter/parser.h"
 
+#include <wctype.h>
+
 /// Block comments and immediate parentheses are easy to parse, but strings
 /// require extra-attention.
 ///
@@ -17,6 +19,7 @@ enum TokenType {
     IMMEDIATE_BRACE,
     IMMEDIATE_STRING_START,
     IMMEDIATE_COMMAND_START,
+    IMMEDIATE_PREFIXED_STRING,
     CONTENT_CMD_1,
     CONTENT_CMD_1_RAW,
     CONTENT_CMD_3,
@@ -87,6 +90,14 @@ static bool scan_content(TSLexer *lexer, TSSymbol content_symbol, char end_char,
         has_content = true;
     }
     return false;
+}
+
+static bool is_identifier_start(int32_t c) {
+    return iswalpha(c) || c == '_' || c > 0x7f;
+}
+
+static bool is_identifier_char(int32_t c) {
+    return is_identifier_start(c) || iswdigit(c) || c == '!';
 }
 
 static bool scan_block_comment(TSLexer *lexer) {
@@ -178,6 +189,18 @@ bool tree_sitter_julia_external_scanner_scan(void *payload, TSLexer *lexer, cons
 
     if (valid_symbols[CONTENT_CMD_3_RAW] && scan_content(lexer, CONTENT_CMD_3_RAW, '`', 3, false)) {
         return true;
+    }
+
+    // Zero-width token: an identifier immediately followed by a string, e.g. u"K" in (a.b)u"K"
+    if (valid_symbols[IMMEDIATE_PREFIXED_STRING] && is_identifier_start(lexer->lookahead)) {
+        mark_end(lexer);
+        while (is_identifier_char(lexer->lookahead)) {
+            advance(lexer);
+        }
+        if (lexer->lookahead == '"') {
+            lexer->result_symbol = IMMEDIATE_PREFIXED_STRING;
+            return true;
+        }
     }
 
     return false;
